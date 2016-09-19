@@ -1,0 +1,161 @@
+library(dplyr)
+library(ggplot2)
+library(mgcv)
+
+#sd(SC_Homeruns_15$Exit_Velocity)
+4.359454
+#mean(SC_Homeruns_15$Launch_Angle)
+27.82879
+
+Statcast_15 <- mutate(Statcast_15, Outcome = ifelse(events == "Home Run",  1, 0))
+
+p1 <- ggplot(Statcast_15, aes(Exit_Velocity, Launch_Angle, color = events)) + 
+  geom_point() + ggtitle(paste("In-Play Outcomes - 2015"))
+print(p1)
+
+fit2 <- gam(Outcome ~ s(Exit_Velocity, Launch_Angle), family = binomial, 
+            data = Statcast_15)
+
+Statcast_15 <- mutate(Statcast_15, 
+                      Prob_Home_Run = exp(predict(fit2))/(1 + exp(predict(fit2))))
+
+p2 <- ggplot(Statcast_15, aes(x = Exit_Velocity, y = Launch_Angle,
+                              color = Prob_Home_Run)) + geom_point() + scale_colour_gradient(limits = c(0, 1), 
+                                                                                             low = "blue", high = "red") + geom_hline(yintercept = 0, color = "blue") + ggtitle(paste("Home Run Probabilities - 2015"))
+
+print(p2)
+
+v <- round(mean(Statcast_15$Launch_Angle) * c(1.629, 2.139, 2.648, 3.158, 3.668), 1)
+
+
+la <- seq(85, 125, length = 100)
+
+data.predict <- rbind(data.frame(Launch_Angle = v[1], Exit_Velocity = la), 
+                      
+                      data.frame(Launch_Angle = v[2], Exit_Velocity = la), 
+                      
+                      data.frame(Launch_Angle = v[3], Exit_Velocity = la),
+                      data.frame(Launch_Angle = v[4], Exit_Velocity = la),
+                      data.frame(Launch_Angle = v[5], Exit_Velocity = la))
+
+
+
+
+lp <- predict(fit2, data.predict)
+data.predict$Probability <- exp(lp)/(1 + exp(lp))
+data.predict$Launch_Angle <- factor(data.predict$Launch_Angle)
+
+p3 <- ggplot(data.predict, aes(Exit_Velocity, Probability,
+                               group = Launch_Angle, color = Launch_Angle)) + geom_line() + ylab("Probability of Home Run") + ggtitle(paste("Home Run Probabilities Two Std. Dev Away from Mean - 2015"))
+
+
+print(p3)
+
+#Only Coors Field code
+library(dplyr)
+library(ggplot2)
+library(mgcv)
+
+#sd(Coors_Field_Homeruns_15$Launch_Angle)
+5.626198
+#mean(Coors_Field_Homeruns_15$Launch_Angle)
+27.97241
+
+Coors_Field_15 <- mutate(Coors_Field_15, Outcome = ifelse(events == "Home Run",  1, 0))
+
+p1 <- ggplot(Coors_Field_15, aes(Exit_Velocity, Launch_Angle, color = events)) + 
+  geom_point() + ggtitle(paste("In-Play Outcomes: Coors Field - 2015"))
+print(p1)
+
+fit2 <- gam(Outcome ~ s(Exit_Velocity, Launch_Angle), family = binomial, 
+            data = Coors_Field_15)
+
+Coors_Field_15 <- mutate(Coors_Field_15, 
+                         Prob_Home_Run = exp(predict(fit2))/(1 + exp(predict(fit2))))
+
+p2 <- ggplot(Coors_Field_15, aes(x = Exit_Velocity, y = Launch_Angle,
+                                 color = Prob_Home_Run)) + geom_point() + scale_colour_gradient(limits = c(0, 1), 
+                                                                                                low = "blue", high = "red") + geom_hline(yintercept = 0, color = "blue") + ggtitle(paste("Home Run Probabilities: Coors Field - 2015"))
+
+print(p2)
+
+v <- round(mean(Coors_Field_15$Launch_Angle) * c(2.500, 3.278, 4.057, 4.836, 5.615), 1)
+
+
+la <- seq(85, 125, length = 100)
+
+data.predict <- rbind(data.frame(Launch_Angle = v[1], Exit_Velocity = la), 
+                      
+                      data.frame(Launch_Angle = v[2], Exit_Velocity = la), 
+                      
+                      data.frame(Launch_Angle = v[3], Exit_Velocity = la),
+                      data.frame(Launch_Angle = v[4], Exit_Velocity = la),
+                      data.frame(Launch_Angle = v[5], Exit_Velocity = la))
+
+
+
+
+lp <- predict(fit2, data.predict)
+data.predict$Probability <- exp(lp)/(1 + exp(lp))
+data.predict$Launch_Angle <- factor(data.predict$Launch_Angle)
+
+p3 <- ggplot(data.predict, aes(Exit_Velocity, Probability,
+                               group = Launch_Angle, color = Launch_Angle)) + geom_line() + ylab("Probability of Home Run") + ggtitle(paste("Coors Field Home Run Probabilities Two Standard Deviations Away from Mean - 2015"))
+
+
+print(p3)
+
+#All parks except Coors Field code
+library(dplyr)
+library(ggplot2)
+library(mgcv)
+
+#sd(Coors_Field_Homeruns_15$Launch_Angle)
+5.626198
+#mean(Coors_Field_Homeruns_15$Launch_Angle)
+27.97241
+
+All_Other_Parks_15 <- mutate(All_Other_Parks_15, Outcome = ifelse(events == "Home Run",  1, 0))
+
+p1 <- ggplot(All_Other_Parks_15, aes(Exit_Velocity, Launch_Angle, color = events)) + 
+  geom_point() + ggtitle(paste("In-Play Outcomes: All Parks Except Coors Field - 2015"))
+print(p1)
+
+fit2 <- gam(Outcome ~ s(Exit_Velocity, Launch_Angle), family = binomial, 
+            data = All_Other_Parks_15)
+
+All_Other_Parks_15 <- mutate(All_Other_Parks_15, 
+                             Prob_Home_Run = exp(predict(fit2))/(1 + exp(predict(fit2))))
+
+p2 <- ggplot(All_Other_Parks_15, aes(x = Exit_Velocity, y = Launch_Angle,
+                                     color = Prob_Home_Run)) + geom_point() + scale_colour_gradient(limits = c(0, 1), 
+                                                                                                    low = "blue", high = "red") + geom_hline(yintercept = 0, color = "blue") + ggtitle(paste("Home Run Probabilities: All Parks Except Coors Field - 2015"))
+
+print(p2)
+
+v <- round(mean(All_Other_Parks_15$Launch_Angle) * c(1.609, 2.111, 2.613, 3.115, 3.616), 1)
+
+
+la <- seq(85, 125, length = 100)
+
+data.predict <- rbind(data.frame(Launch_Angle = v[1], Exit_Velocity = la), 
+                      
+                      data.frame(Launch_Angle = v[2], Exit_Velocity = la), 
+                      
+                      data.frame(Launch_Angle = v[3], Exit_Velocity = la),
+                      data.frame(Launch_Angle = v[4], Exit_Velocity = la),
+                      data.frame(Launch_Angle = v[5], Exit_Velocity = la))
+
+
+
+
+lp <- predict(fit2, data.predict)
+data.predict$Probability <- exp(lp)/(1 + exp(lp))
+data.predict$Launch_Angle <- factor(data.predict$Launch_Angle)
+
+p3 <- ggplot(data.predict, aes(Exit_Velocity, Probability,
+                               group = Launch_Angle, color = Launch_Angle)) + geom_line() + ylab("Probability of Home Run") + ggtitle(paste("Home Run Probabilities Two Standard Deviations Away from Mean: Non-Coors Field Parks - 2015"))
+
+
+print(p3)
+

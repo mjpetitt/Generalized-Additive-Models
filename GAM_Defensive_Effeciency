@@ -1,0 +1,91 @@
+library(dplyr)
+library(ggplot2)
+library(mgcv)
+
+#Non-Cubs
+Non_CHNDEF_16 <- mutate(Non_CHNDEF_16, Outcome = ifelse(Reach_Base == "Hit or Error",  1, 0))
+
+p1 <- ggplot(Non_CHNDEF_16, aes(Exit_Velocity, Launch_Angle, color = Reach_Base)) + 
+  geom_point() + ggtitle(paste("In-Play Outcomes - 2016"))
+print(p1)
+
+fit2 <- gam(Outcome ~ s(Exit_Velocity, Launch_Angle), family = binomial, 
+            data = Non_CHNDEF_16)
+
+Non_CHNDEF_16 <- mutate(Non_CHNDEF_16, 
+                      Prob_Hit = exp(predict(fit2))/(1 + exp(predict(fit2))))
+
+p2 <- ggplot(Non_CHNDEF_16, aes(x = Exit_Velocity, y = Launch_Angle,
+                              color = Prob_Hit)) + geom_point() + scale_colour_gradient(limits = c(0, 1), 
+                                                                                             low = "blue", high = "red") + geom_hline(yintercept = 0, color = "blue") + ggtitle(paste("Hit Probabilities - 2016"))
+
+print(p2)
+
+v <- round(mean(Non_CHNDEF_16$Launch_Angle) * c(-0.332, 1.002, 2.336), 1)
+
+
+la <- seq(0, 120, length = 100)
+
+data.predict <- rbind(data.frame(Launch_Angle = v[1], Exit_Velocity = la), 
+                      
+                      data.frame(Launch_Angle = v[2], Exit_Velocity = la), 
+                      
+                      data.frame(Launch_Angle = v[3], Exit_Velocity = la))
+                      
+
+
+
+lp <- predict(fit2, data.predict)
+data.predict$Probability <- exp(lp)/(1 + exp(lp))
+data.predict$Launch_Angle <- factor(data.predict$Launch_Angle)
+
+p3 <- ggplot(data.predict, aes(Exit_Velocity, Probability,
+                               group = Launch_Angle, color = Launch_Angle)) + geom_line() + ylab("Probability of Reach Base") + ggtitle(paste("Reach Base Probabilities One Standard Deviation Away from Mean - 2016"))
+
+
+print(p3)
+
+
+#Cubs Defense
+CHNDEF_16 <- mutate(CHNDEF_16, Outcome = ifelse(Reach_Base == "Hit or Error",  1, 0))
+
+p1 <- ggplot(CHNDEF_16, aes(Exit_Velocity, Launch_Angle, color = Reach_Base)) + 
+  geom_point() + ggtitle(paste("In-Play Outcomes: Cubs - 2016"))
+print(p1)
+
+fit2 <- gam(Outcome ~ s(Exit_Velocity, Launch_Angle), family = binomial, 
+            data = CHNDEF_16)
+
+CHNDEF_16 <- mutate(CHNDEF_16, 
+                        Prob_Hit = exp(predict(fit2))/(1 + exp(predict(fit2))))
+
+p2 <- ggplot(CHNDEF_16, aes(x = Exit_Velocity, y = Launch_Angle,
+                                color = Prob_Hit)) + geom_point() + scale_colour_gradient(limits = c(0, 1), 
+                                                                                          low = "blue", high = "red") + geom_hline(yintercept = 0, color = "blue") + ggtitle(paste("Hit Probabilities - 2016"))
+
+print(p2)
+
+v <- round(mean(CHNDEF_16$Launch_Angle) * c(-0.305, 1.088, 2.144), 1)
+
+
+la <- seq(0, 120, length = 100)
+
+data.predict <- rbind(data.frame(Launch_Angle = v[1], Exit_Velocity = la), 
+                      
+                      data.frame(Launch_Angle = v[2], Exit_Velocity = la), 
+                      
+                      data.frame(Launch_Angle = v[3], Exit_Velocity = la))
+
+
+
+
+lp <- predict(fit2, data.predict)
+data.predict$Probability <- exp(lp)/(1 + exp(lp))
+data.predict$Launch_Angle <- factor(data.predict$Launch_Angle)
+
+p3 <- ggplot(data.predict, aes(Exit_Velocity, Probability,
+                               group = Launch_Angle, color = Launch_Angle)) + geom_line() + ylab("Probability of Reach Base") + ggtitle(paste("Reach Base Probabilities One Standard Deviation Away from Mean - 2016"))
+
+
+print(p3)
+
